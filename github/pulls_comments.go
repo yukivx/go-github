@@ -152,20 +152,18 @@ func (s *PullRequestsService) CreateComment(ctx context.Context, owner, repo str
 	return c, resp, nil
 }
 
-// CreateCommentInReplyTo creates a new comment as a reply to an existing pull request comment.
+// CreateCommentInReplyTo creates a new comment as a reply to an existing pull request review comment.
 //
-// GitHub API docs: https://docs.github.com/rest/pulls/comments#create-a-review-comment-for-a-pull-request
+// GitHub API docs: https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#create-a-reply-for-a-review-comment
 //
-//meta:operation POST /repos/{owner}/{repo}/pulls/{pull_number}/comments
+//meta:operation POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_number}/replies
 func (s *PullRequestsService) CreateCommentInReplyTo(ctx context.Context, owner, repo string, number int, body string, commentID int64) (*PullRequestComment, *Response, error) {
 	comment := &struct {
 		Body      string `json:"body,omitempty"`
-		InReplyTo int64  `json:"in_reply_to,omitempty"`
 	}{
 		Body:      body,
-		InReplyTo: commentID,
 	}
-	u := fmt.Sprintf("repos/%v/%v/pulls/%d/comments", owner, repo, number)
+	u := fmt.Sprintf("repos/%v/%v/pulls/%d/comments/{comment_number}/replies", owner, repo, number, commentID)
 	req, err := s.client.NewRequest("POST", u, comment)
 	if err != nil {
 		return nil, nil, err
